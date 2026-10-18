@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forge — Personal Operating System | Offline & Privacy-First</title>
+  <meta name="description" content="Forge is a local-first Personal Operating System for deep work, habit consistency, and daily execution. 100% offline and free until v1.2.0.">
+  <meta name="theme-color" content="#0B0F17">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Forge — Personal Operating System">
+  <meta property="og:description" content="Master your day with deep work, habit streaks, and smart screen-time insights. 100% offline and free until v1.2.0.">
+  <meta property="og:type" content="website">
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #090D16;
+      --bg-card: rgba(18, 24, 38, 0.7);
+      --bg-card-hover: rgba(26, 34, 52, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(99, 102, 241, 0.3);
+      --text-main: #F1F5F9;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      --primary: #6366F1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --cyan: #38BDF8;
+      --emerald: #10B981;
+      --amber: #F59E0B;
+      --rose: #F43F5E;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Ambient Glow Background */
+    .ambient-glow {
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(56, 189, 248, 0.05) 50%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header & Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(16px);
+      background: rgba(9, 13, 22, 0.85);
+      border-bottom: 1px solid var(--border);
+      z-index: 50;
+    }
+
+    .nav-container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+      font-size: 20px;
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
+
+    nav {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--text-main);
+    }
+
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .btn-nav:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    /* Announcement Banner */
+    .announcement-banner {
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), rgba(16, 185, 129, 0.15));
+      border-bottom: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .badge-pill {
+      background: var(--emerald);
+      color: #064E3B;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      max-width: 900px;
+      margin: 60px auto 40px;
+      padding: 0 24px;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 30px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid var(--border-accent);
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 62px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 36px;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #4F46E5);
+      color: white;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px var(--primary-glow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      text-decoration: none;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Core Guarantee Box */
+    .guarantee-box {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 18px 24px;
+      border-radius: 16px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-align: left;
+    }
+
+    .guarantee-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .guarantee-text h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #34D399;
+      margin-bottom: 2px;
+    }
+
+    .guarantee-text p {
+      font-size: 13px;
+      color: #A7F3D0;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 60px 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Features Grid */
+    .section-title {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-title h2 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      margin-bottom: 12px;
+    }
+
+    .section-title p {
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-4px);
+    }
+
+    .feature-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Privacy & Policy Section */
+    .policy-section {
+      background: rgba(14, 20, 32, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 40px;
+      margin-top: 40px;
+    }
+
+    .policy-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+
+    .policy-header h2 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .policy-meta {
+      font-size: 13px;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .policy-content h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 28px 0 12px;
+      color: var(--cyan);
+    }
+
+    .policy-content p, .policy-content li {
+      font-size: 14.5px;
+      color: #CBD5E1;
+      line-height: 1.65;
+      margin-bottom: 12px;
+    }
+
+    .policy-content ul {
+      padding-left: 24px;
+      margin-bottom: 16px;
+    }
+
+    .policy-highlight {
+      background: rgba(99, 102, 241, 0.08);
+      border-left: 4px solid var(--primary);
+      padding: 14px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+    }
+
+    /* Footer */
+    footer {
+      background: #06090E;
+      border-top: 1px solid var(--border);
+      padding: 48px 24px 32px;
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    .footer-brand h4 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .footer-brand p {
+      font-size: 13px;
+      color: var(--text-dim);
+      max-width: 320px;
+    }
+
+    .footer-links h5 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .footer-links ul {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 8px;
+    }
+
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 13.5px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-main);
+    }
+
+    .copyright {
+      max-width: 1140px;
+      margin: 32px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    @media (max-width: 768px) {
+      .nav-container { padding: 14px 18px; }
+      nav { display: none; }
+      .hero { margin: 40px auto 24px; }
+      .policy-section { padding: 28px 20px; }
+      .guarantee-box { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-banner">
+    <span class="badge-pill">Free & Offline</span>
+    <span>Forge is 100% offline and free until it reaches <strong>v1.2.0</strong>. No account required.</span>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <div class="brand-icon">F</div>
+        <span>FORGE</span>
+      </a>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#roadmap">Offline Architecture</a>
+        <a href="#privacy">Privacy Policy</a>
+        <a href="https://github.com/NANDA072007/Forge-release" class="btn-nav" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-tag">⚡ Personal Operating System • v1.0.0 Release</div>
+    <h1>Master Your Day with Zero Digital Noise</h1>
+    <p>A unified command center for deep work, habit consistency, and daily execution. Built with local-first encrypted storage and distraction-shielding.</p>
+    
+    <div class="hero-actions">
+      <a href="#privacy" class="btn-primary">
+        <span>🛡️ Read Privacy Policy</span>
+      </a>
+      <a href="#features" class="btn-secondary">
+        <span>Explore Features</span>
+        <span>↓</span>
+      </a>
+    </div>
+
+    <!-- Free & Offline Guarantee Card -->
+    <div class="guarantee-box">
+      <div class="guarantee-icon">🔒</div>
+      <div class="guarantee-text">
+        <h4>100% Offline & Free Through Version 1.2.0</h4>
+        <p>No mandatory logins, no credit cards, and zero cloud dependencies. Your data stays entirely in a private SQLite database on your device. Every core and premium feature is completely free until v1.2.0.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features -->
+  <main class="container" id="features">
+    <div class="section-title">
+      <h2>Engineered for High-Agency Execution</h2>
+      <p>Stop juggling disconnected habit trackers, timers, and to-do lists.</p>
+    </div>
+
+    <div class="features-grid">
+      <!-- 1. Daily Focus & Command Center -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper" style="background: rgba(99, 102, 241, 0.15); color: #818CF8;">🎯</div>
+        <h3>#1 Daily Focus Command Center</h3>
+        <p>An uncluttered dashboard spotlighting your highest-impact task, immediate timeline block, and real-time health metrics (Deep Work time, Habit score, and Tasks done).</p>
+      </div>
+
+      <!-- 2. Pomodoro & Distraction Shield -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper" style="background: rgba(56, 189, 248, 0.15); color: #38BDF8;">⏱️</div>
+        <h3>Deep Work & Distraction Shield</h3>
+        <p>Lock into single-task execution with native Pomodoro intervals and real-time distraction protection that alerts you when straying from active focus sessions.</p>
+      </div>
+
+      <!-- 3. Daily Habit Matrix -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #34D399;">🔥</div>
+        <h3>Interactive Habit Matrix</h3>
+        <p>Track streaks and log routines with 1-tap toggling directly from your home screen. Never lose momentum with consistency algorithms.</p>
+      </div>
+
+      <!-- 4. Screen Time & Plan vs Reality -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24;">📊</div>
+        <h3>Screen Time: Plan vs. Reality</h3>
+        <p>Intelligently categorizes device usage into Productive, Neutral, and Distracting apps to measure actual execution against your scheduled timeline.</p>
+      </div>
+
+      <!-- 5. Goals & Quarterly Milestones -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper" style="background: rgba(244, 63, 94, 0.15); color: #FB7185;">🏆</div>
+        <h3>Goals & Projects Engine</h3>
+        <p>Break high-level aspirations into tangible quarterly milestones and day-to-day actionable tasks with progress rings and timeline synchronization.</p>
+      </div>
+
+      <!-- 6. Evening Review & Journal -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper" style="background: rgba(168, 85, 247, 0.15); color: #C084FC;">✍️</div>
+        <h3>Evening Review & Journaling</h3>
+        <p>Close each day intentionally with guided reflection prompts, mood tracking, and retrospective notes stored privately in your personal vault.</p>
+      </div>
+    </div>
+
+    <!-- Offline Architecture Section -->
+    <div class="guarantee-box" id="roadmap" style="background: rgba(99, 102, 241, 0.08); border-color: var(--border-accent); margin-bottom: 60px;">
+      <div class="guarantee-icon">⚡</div>
+      <div class="guarantee-text">
+        <h4 style="color: var(--cyan);">Why Forge is Offline & Account-Free Today</h4>
+        <p style="color: #CBD5E1;">Most productivity apps demand your email, spam you with newsletters, and store your intimate reflections on commercial cloud servers. Forge does the opposite: <strong>everything is local-first</strong>. When cloud backup arrives in v1.2+, it will be optional, zero-knowledge, and end-to-end encrypted.</p>
+      </div>
+    </div>
+
+    <!-- Google Play Compliant Privacy Policy Section -->
+    <section class="policy-section" id="privacy">
+      <div class="policy-header">
+        <h2>Privacy Policy for Forge</h2>
+        <div class="policy-meta">Effective Date: October 18, 2026 • Application Version: 1.0.0 • Package: com.nanda.forge</div>
+      </div>
+
+      <div class="policy-content">
+        <div class="policy-highlight">
+          <strong>Summary:</strong> Forge is a local-first application. We do not sell your personal data, embed advertising trackers, or transfer your journal entries or task data to external servers. Forge is completely offline and free until it reaches v1.2.0.
+        </div>
+
+        <h3>1. Local-First Data Storage</h3>
+        <p>All tasks, habits, commitments, goals, and daily journal reflections are stored exclusively in a secure SQLite database located within Forge's private sandbox on your Android device. Your data is protected by your device's native hardware encryption.</p>
+
+        <h3>2. Sensitive Android Permissions</h3>
+        <p>To deliver automated focus protection and screen-time insights, Forge utilizes specific Android platform capabilities:</p>
+        
+        <ul>
+          <li>
+            <strong>Accessibility Service (<code>BIND_ACCESSIBILITY_SERVICE</code>):</strong><br>
+            Used exclusively for the optional <em>Focus Protection</em> feature during active deep work blocks. It observes the foreground package to warn you if a distracting app is opened. 
+            <br><em>Forge NEVER reads keystrokes, personal chats, passwords, or credit cards. All processing is strictly ephemeral and stays on-device.</em>
+          </li>
+          <li>
+            <strong>Usage Access (<code>PACKAGE_USAGE_STATS</code>):</strong><br>
+            Reads total minutes spent in foreground applications to display your daily screen-time breakdown and compute your Focus Alignment Score.
+          </li>
+          <li>
+            <strong>Package Visibility (<code>QUERY_ALL_PACKAGES</code>):</strong><br>
+            Resolves installed application display names (e.g., "YouTube" instead of internal package strings) to allow clean productivity categorization.
+          </li>
+          <li>
+            <strong>Notifications (<code>POST_NOTIFICATIONS</code>):</strong><br>
+            Sends scheduled focus timer alerts and daily review check-in reminders locally.
+          </li>
+        </ul>
+
+        <h3>3. Zero Third-Party Analytics & Tracking</h3>
+        <p>Forge does NOT integrate commercial behavioral tracking SDKs, advertising networks, or data broker tools. We have zero interest in monetizing your personal habits or screen time.</p>
+
+        <h3>4. Data Deletion & User Rights</h3>
+        <p>You maintain 100% control over your information. You can permanently erase all data at any moment by clearing the application cache and storage via <em>Android Settings → Apps → Forge → Storage → Clear Storage</em>, or simply by uninstalling Forge.</p>
+
+        <h3>5. Contact & Support</h3>
+        <p>For questions or verification regarding this Privacy Policy or Forge's privacy-first architecture, please reach out directly:</p>
+        <p>
+          <strong>Developer:</strong> Nanda Forge Team<br>
+          <strong>Email:</strong> support@forgeapp.io (or via our GitHub repository issues)<br>
+          <strong>Repository:</strong> <a href="https://github.com/NANDA072007/Forge-release" style="color: var(--cyan); text-decoration: underline;" target="_blank">github.com/NANDA072007/Forge-release</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <h4>FORGE</h4>
+        <p>The privacy-first Personal Operating System for deep work and daily execution. 100% offline & free until v1.2.0.</p>
+      </div>
+      <div class="footer-links">
+        <h5>Navigation</h5>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#roadmap">Offline Guarantee</a></li>
+          <li><a href="#privacy">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h5>Project</h5>
+        <ul>
+          <li><a href="https://github.com/NANDA072007/Forge-release" target="_blank" rel="noopener">GitHub Repository</a></li>
+          <li><a href="#privacy">Terms & Compliance</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copyright">
+      &copy; 2026 Forge. All rights reserved. Built with privacy-first local SQLite architecture.
+    </div>
+  </footer>
+
+</body>
+</html>
